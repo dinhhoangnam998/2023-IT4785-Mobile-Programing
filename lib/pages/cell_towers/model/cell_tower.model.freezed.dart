@@ -20,6 +20,7 @@ CellTower _$CellTowerFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CellTower {
+  int get id => throw _privateConstructorUsedError;
   int get cellId => throw _privateConstructorUsedError;
   int get lac => throw _privateConstructorUsedError;
   int get mnc => throw _privateConstructorUsedError;
@@ -27,6 +28,7 @@ mixin _$CellTower {
   double get long => throw _privateConstructorUsedError;
   double get lat => throw _privateConstructorUsedError;
   int get networkType => throw _privateConstructorUsedError;
+  int get radiusInMeters => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -40,13 +42,15 @@ abstract class $CellTowerCopyWith<$Res> {
       _$CellTowerCopyWithImpl<$Res, CellTower>;
   @useResult
   $Res call(
-      {int cellId,
+      {int id,
+      int cellId,
       int lac,
       int mnc,
       int mcc,
       double long,
       double lat,
-      int networkType});
+      int networkType,
+      int radiusInMeters});
 }
 
 /// @nodoc
@@ -62,6 +66,7 @@ class _$CellTowerCopyWithImpl<$Res, $Val extends CellTower>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? cellId = null,
     Object? lac = null,
     Object? mnc = null,
@@ -69,8 +74,13 @@ class _$CellTowerCopyWithImpl<$Res, $Val extends CellTower>
     Object? long = null,
     Object? lat = null,
     Object? networkType = null,
+    Object? radiusInMeters = null,
   }) {
     return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
       cellId: null == cellId
           ? _value.cellId
           : cellId // ignore: cast_nullable_to_non_nullable
@@ -98,6 +108,10 @@ class _$CellTowerCopyWithImpl<$Res, $Val extends CellTower>
       networkType: null == networkType
           ? _value.networkType
           : networkType // ignore: cast_nullable_to_non_nullable
+              as int,
+      radiusInMeters: null == radiusInMeters
+          ? _value.radiusInMeters
+          : radiusInMeters // ignore: cast_nullable_to_non_nullable
               as int,
     ) as $Val);
   }
@@ -112,13 +126,15 @@ abstract class _$$CellTowerImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int cellId,
+      {int id,
+      int cellId,
       int lac,
       int mnc,
       int mcc,
       double long,
       double lat,
-      int networkType});
+      int networkType,
+      int radiusInMeters});
 }
 
 /// @nodoc
@@ -132,6 +148,7 @@ class __$$CellTowerImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? cellId = null,
     Object? lac = null,
     Object? mnc = null,
@@ -139,8 +156,13 @@ class __$$CellTowerImplCopyWithImpl<$Res>
     Object? long = null,
     Object? lat = null,
     Object? networkType = null,
+    Object? radiusInMeters = null,
   }) {
     return _then(_$CellTowerImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
       cellId: null == cellId
           ? _value.cellId
           : cellId // ignore: cast_nullable_to_non_nullable
@@ -169,6 +191,10 @@ class __$$CellTowerImplCopyWithImpl<$Res>
           ? _value.networkType
           : networkType // ignore: cast_nullable_to_non_nullable
               as int,
+      radiusInMeters: null == radiusInMeters
+          ? _value.radiusInMeters
+          : radiusInMeters // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -177,17 +203,21 @@ class __$$CellTowerImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CellTowerImpl implements _CellTower {
   const _$CellTowerImpl(
-      {required this.cellId,
+      {required this.id,
+      required this.cellId,
       required this.lac,
       required this.mnc,
       required this.mcc,
       required this.long,
       required this.lat,
-      required this.networkType});
+      required this.networkType,
+      required this.radiusInMeters});
 
   factory _$CellTowerImpl.fromJson(Map<String, dynamic> json) =>
       _$$CellTowerImplFromJson(json);
 
+  @override
+  final int id;
   @override
   final int cellId;
   @override
@@ -202,10 +232,12 @@ class _$CellTowerImpl implements _CellTower {
   final double lat;
   @override
   final int networkType;
+  @override
+  final int radiusInMeters;
 
   @override
   String toString() {
-    return 'CellTower(cellId: $cellId, lac: $lac, mnc: $mnc, mcc: $mcc, long: $long, lat: $lat, networkType: $networkType)';
+    return 'CellTower(id: $id, cellId: $cellId, lac: $lac, mnc: $mnc, mcc: $mcc, long: $long, lat: $lat, networkType: $networkType, radiusInMeters: $radiusInMeters)';
   }
 
   @override
@@ -213,6 +245,7 @@ class _$CellTowerImpl implements _CellTower {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CellTowerImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.cellId, cellId) || other.cellId == cellId) &&
             (identical(other.lac, lac) || other.lac == lac) &&
             (identical(other.mnc, mnc) || other.mnc == mnc) &&
@@ -220,13 +253,15 @@ class _$CellTowerImpl implements _CellTower {
             (identical(other.long, long) || other.long == long) &&
             (identical(other.lat, lat) || other.lat == lat) &&
             (identical(other.networkType, networkType) ||
-                other.networkType == networkType));
+                other.networkType == networkType) &&
+            (identical(other.radiusInMeters, radiusInMeters) ||
+                other.radiusInMeters == radiusInMeters));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, cellId, lac, mnc, mcc, long, lat, networkType);
+  int get hashCode => Object.hash(runtimeType, id, cellId, lac, mnc, mcc, long,
+      lat, networkType, radiusInMeters);
 
   @JsonKey(ignore: true)
   @override
@@ -244,17 +279,21 @@ class _$CellTowerImpl implements _CellTower {
 
 abstract class _CellTower implements CellTower {
   const factory _CellTower(
-      {required final int cellId,
+      {required final int id,
+      required final int cellId,
       required final int lac,
       required final int mnc,
       required final int mcc,
       required final double long,
       required final double lat,
-      required final int networkType}) = _$CellTowerImpl;
+      required final int networkType,
+      required final int radiusInMeters}) = _$CellTowerImpl;
 
   factory _CellTower.fromJson(Map<String, dynamic> json) =
       _$CellTowerImpl.fromJson;
 
+  @override
+  int get id;
   @override
   int get cellId;
   @override
@@ -269,6 +308,8 @@ abstract class _CellTower implements CellTower {
   double get lat;
   @override
   int get networkType;
+  @override
+  int get radiusInMeters;
   @override
   @JsonKey(ignore: true)
   _$$CellTowerImplCopyWith<_$CellTowerImpl> get copyWith =>

@@ -15,7 +15,7 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CellTowersCubit(),
-      child: App(),
+      child: const App(),
     );
   }
 }
