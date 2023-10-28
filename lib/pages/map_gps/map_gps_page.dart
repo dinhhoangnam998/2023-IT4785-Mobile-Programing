@@ -60,14 +60,14 @@ Color getCircleColor(CellTower cell, LatLng currentLocation) {
   return const Color.fromARGB(255, 3, 161, 87).withOpacity(0.4);
 }
 
-class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+class MapGPSPage extends StatefulWidget {
+  const MapGPSPage({super.key});
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  State<MapGPSPage> createState() => _MapGPSPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapGPSPageState extends State<MapGPSPage> {
   LatLng? _currentLocation;
   StreamSubscription<Position>? _positionStream;
   final Completer<GoogleMapController> _mapController =
