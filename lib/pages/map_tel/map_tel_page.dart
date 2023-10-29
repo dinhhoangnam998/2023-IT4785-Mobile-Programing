@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_2023_it4785/pages/cell_towers/model/cell_tower.model.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/helper.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/model/ParsedTelephonyInfo.dart';
-import 'package:flutter_animarker/core/ripple_marker.dart';
 import 'package:flutter_animarker/flutter_map_marker_animation.dart';
 import 'package:flutter_telephony_info/flutter_telephony_info.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
@@ -142,7 +141,7 @@ class _MapTelPageState extends State<MapTelPage> {
       List<(ParsedTelephonyInfo, CellTower)> records) async {
     if (records.isEmpty) return;
 
-    Set<RippleMarker> markers = records.map(
+    additionalMarkers = records.map(
       (record) {
         CellTower tower = record.$2;
         return RippleMarker(
@@ -153,7 +152,7 @@ class _MapTelPageState extends State<MapTelPage> {
       },
     ).toSet();
 
-    Set<Circle> circles = records.map(
+    additionalCircles = records.map(
       (record) {
         ParsedTelephonyInfo tel = record.$1;
         CellTower tower = record.$2;
@@ -173,10 +172,7 @@ class _MapTelPageState extends State<MapTelPage> {
     (await _controller.future)
         .animateCamera(CameraUpdate.newCameraPosition(newPosition));
 
-    setState(() {
-      additionalMarkers = markers;
-      additionalCircles = circles;
-    });
+    setState(() {});
   }
 
   void findMyLocation() async {
