@@ -1,14 +1,14 @@
 import 'package:flutter_telephony_info/flutter_telephony_info.dart';
 
 class ParsedTelephonyInfo {
-  final TelephonyInfo rawTelephonyInfo;
+  final TelephonyInfo? rawTelephonyInfo;
   final int mcc;
   final int mnc;
   final int lac;
   final int cellId;
   final int signalStrengthLevel;
   ParsedTelephonyInfo(
-      {required this.rawTelephonyInfo,
+      {this.rawTelephonyInfo,
       required this.mcc,
       required this.mnc,
       required this.lac,

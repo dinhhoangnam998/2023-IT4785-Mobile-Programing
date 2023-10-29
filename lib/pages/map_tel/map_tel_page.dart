@@ -1,9 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_2023_it4785/pages/cell_towers/model/cell_tower.model.dart';
+import 'package:flutter_2023_it4785/pages/map_tel/helper.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/model/ParsedTelephonyInfo.dart';
 import 'package:flutter_telephony_info/flutter_telephony_info.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
@@ -11,26 +13,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapTelPage extends StatefulWidget {
   final List<CellTower> cellTowers;
-
   const MapTelPage({super.key, required this.cellTowers});
-
   @override
   State<MapTelPage> createState() => _MapTelPageState();
 }
 
 class _MapTelPageState extends State<MapTelPage> {
   // GG Maps
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
   final CameraPosition _initPosition = const CameraPosition(
-      target: LatLng(21.006125886435946, 105.84324355419052), zoom: 9.0);
-
+      target: LatLng(21.006125886435946, 105.84324355419052), // HUST
+      zoom: 9.0);
   // Maker Cluster
   late ClusterManager _manager;
-  Set<Marker> markers = Set();
-
+  Set<Marker> markers = {};
+  Set<Marker> additionalMarkers = {};
+  Set<Circle> additionalCircles = {};
   // Telephony
   final _flutterTelephonyInfoPlugin = TelephonyAPI();
-  List<ParsedTelephonyInfo>? _currentConnectingTelInfo;
   String? errorMessage;
 
   @override
@@ -41,64 +41,72 @@ class _MapTelPageState extends State<MapTelPage> {
 
   ClusterManager _initClusterManager() {
     return ClusterManager<CellTower>(widget.cellTowers, _updateMarkers,
-        markerBuilder: _markerBuilder, stopClusteringZoom: 14);
+        markerBuilder: ClusteringMakersHelper.markerBuilder,
+        stopClusteringZoom: 14);
   }
 
   void _updateMarkers(Set<Marker> markers) {
-    // print('Updated ${markers.length} markers');
     setState(() {
       this.markers = markers;
     });
   }
 
-  void _updateLocation() async {
+  void notify(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ));
+  }
+
+  Future<List<ParsedTelephonyInfo>> getParsedTelephonyInfo() async {
     try {
       List<TelephonyInfo?>? telInfoList =
           await _flutterTelephonyInfoPlugin.getInfo();
-
       if (telInfoList == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("No telephony info found!"),
-          backgroundColor: Colors.blue,
-        ));
-      } else {
-        List<TelephonyInfo> telInfos = telInfoList
-            .where((element) => element != null)
-            .toList() as List<TelephonyInfo>;
-
-        var errors = [];
-        List<ParsedTelephonyInfo> parsedTelInfos = [];
-        telInfos.forEach((rawTelephonyInfo) {
-          try {
-            ParsedTelephonyInfo parsedTelInfo =
-                parseRawTelephonyInfo(rawTelephonyInfo);
-            parsedTelInfos.add(parsedTelInfo);
-          } catch (e) {
-            errors.add(e.toString());
-          }
-        });
-        _currentConnectingTelInfo = parsedTelInfos;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              "Parsed successfully: ${parsedTelInfos.length}/${telInfos.length}!"),
-          backgroundColor: Colors.blue,
-        ));
+        notify("No telephony info was found!", Colors.blue);
+        return Future.value([]);
       }
+      List<ParsedTelephonyInfo> parsedTelInfos = [];
+      telInfoList.forEach((rawTelephonyInfo) {
+        if (rawTelephonyInfo != null) {
+          try {
+            parsedTelInfos.add(parseRawTelephonyInfo(rawTelephonyInfo));
+          } catch (e) {}
+        }
+      });
+      notify(
+          "Parsed successfully: ${parsedTelInfos.length}/${telInfoList.length}!",
+          Colors.blue);
+      return parsedTelInfos;
     } on PlatformException catch (e) {
-      errorMessage = e.toString();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(errorMessage!),
-        backgroundColor: Colors.orange,
-      ));
+      notify(e.toString(), Colors.red);
+      return Future.value([]);
     }
-    setState(() {});
   }
 
-  (Set<Marker>, Set<Circle>) _getMarkersAndCircles() {
-    if (_currentConnectingTelInfo == null) return ({}, {});
+  Future<List<ParsedTelephonyInfo>> getMockupParsedTelephonyInfo() async {
+    List<ParsedTelephonyInfo> parsedTelInfos = [
+      ParsedTelephonyInfo(
+          mcc: 452,
+          mnc: 2,
+          lac: 12059,
+          cellId: 78983792,
+          signalStrengthLevel: 2),
+      ParsedTelephonyInfo(
+          mcc: 452,
+          mnc: 2,
+          lac: 12059,
+          cellId: 78983341,
+          signalStrengthLevel: 4)
+    ];
+    return parsedTelInfos;
+  }
 
-    Set<CellTower> currentConnectingCellTowers = {};
-    _currentConnectingTelInfo!.forEach((telInfo) {
+  List<CellTower> findAccordingCellTower(
+      List<ParsedTelephonyInfo> parsedTelInfos) {
+    List<CellTower> foundCellTowers = [];
+    List<ParsedTelephonyInfo> notFoundTelInfos = [];
+    parsedTelInfos.forEach((telInfo) {
       try {
         var tower = widget.cellTowers.firstWhere(
           (cellTower) =>
@@ -107,23 +115,59 @@ class _MapTelPageState extends State<MapTelPage> {
               telInfo.lac == cellTower.lac &&
               telInfo.cellId == cellTower.cellId,
         );
-        currentConnectingCellTowers.add(tower);
+        foundCellTowers.add(tower);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Cannot find tel info in cell towers list'),
-          backgroundColor: Colors.orange,
-        ));
+        notFoundTelInfos.add(telInfo);
       }
     });
+    if (notFoundTelInfos.isNotEmpty) {
+      notify(
+          '${notFoundTelInfos.length}/${parsedTelInfos.length} parsedTelInfos were not found according cell towers!',
+          Colors.orange);
+    }
+    return foundCellTowers;
+  }
 
-    return ({}, {});
+  void visualizeConnectingCellTowers(
+      List<CellTower> connectingCellTowers) async {
+    if (connectingCellTowers.isEmpty) return;
+
+    Set<Marker> markers = connectingCellTowers
+        .map((tower) => Marker(
+            markerId: MarkerId(tower.id.toString()),
+            position: LatLng(tower.lat, tower.long)))
+        .toSet();
+    Set<Circle> circles = connectingCellTowers
+        .map(
+          (tower) => Circle(
+              circleId: CircleId(tower.id.toString()),
+              center: LatLng(tower.lat, tower.long),
+              strokeWidth: 2),
+        )
+        .toSet();
+
+    CameraPosition newPosition = CameraPosition(
+        target: LatLng(
+            connectingCellTowers.first.lat, connectingCellTowers.first.long),
+        zoom: 15);
+    (await _controller.future)
+        .animateCamera(CameraUpdate.newCameraPosition(newPosition));
+
+    setState(() {
+      additionalMarkers = markers;
+      additionalCircles = circles;
+    });
+  }
+
+  void findMyLocation() async {
+    // List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
+    List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
+    List<CellTower> connectingCells = findAccordingCellTower(parsedTels);
+    visualizeConnectingCellTowers(connectingCells);
   }
 
   @override
   Widget build(BuildContext context) {
-    var (Set<Marker> additionalMarkers, Set<Circle> additionalCircles) =
-        _getMarkersAndCircles();
-
     return Scaffold(
         body: GoogleMap(
             mapType: MapType.normal,
@@ -137,58 +181,10 @@ class _MapTelPageState extends State<MapTelPage> {
             onCameraMove: _manager.onCameraMove,
             onCameraIdle: _manager.updateMap),
         floatingActionButton: FloatingActionButton(
-          onPressed: _updateLocation,
+          onPressed: findMyLocation,
           mini: true,
           child: const Icon(Icons.gps_fixed_outlined),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat);
-  }
-
-  Future<Marker> Function(Cluster<CellTower>) get _markerBuilder =>
-      (cluster) async {
-        return Marker(
-          markerId: MarkerId(cluster.getId()),
-          position: cluster.location,
-          onTap: () {
-            print('---- $cluster');
-            cluster.items.forEach((p) => print(p));
-          },
-          icon: await _getMarkerBitmap(cluster.isMultiple ? 125 : 75,
-              text: cluster.isMultiple ? cluster.count.toString() : null),
-        );
-      };
-
-  Future<BitmapDescriptor> _getMarkerBitmap(int size, {String? text}) async {
-    // if (kIsWeb) size = (size / 2).floor();
-
-    final PictureRecorder pictureRecorder = PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()..color = Colors.orange;
-    final Paint paint2 = Paint()..color = Colors.white;
-
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.2, paint2);
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.8, paint1);
-
-    if (text != null) {
-      TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
-      painter.text = TextSpan(
-        text: text,
-        style: TextStyle(
-            fontSize: size / 3,
-            color: Colors.white,
-            fontWeight: FontWeight.normal),
-      );
-      painter.layout();
-      painter.paint(
-        canvas,
-        Offset(size / 2 - painter.width / 2, size / 2 - painter.height / 2),
-      );
-    }
-
-    final img = await pictureRecorder.endRecording().toImage(size, size);
-    final data = await img.toByteData(format: ImageByteFormat.png) as ByteData;
-
-    return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
   }
 }
