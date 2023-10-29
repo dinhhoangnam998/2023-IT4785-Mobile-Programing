@@ -32,4 +32,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-      - assets/data/cell_info.json
+      - assets/data/
+      - assets/images/

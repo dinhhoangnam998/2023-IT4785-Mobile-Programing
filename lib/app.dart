@@ -4,9 +4,7 @@ import 'package:flutter_2023_it4785/pages/cell_towers/cubit/cell_towers_cubit.da
 import 'package:flutter_2023_it4785/pages/map_gps/map_gps_page.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/map_tel_page.dart';
 import 'package:flutter_2023_it4785/pages/settings/settings_page.dart';
-import 'package:flutter_2023_it4785/pages/telephony/telephony_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -17,20 +15,6 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _currentIndex = 0;
-  // final List _pages = const [
-  //   MapTelPage(),
-  //   MapGPSPage(),
-  //   CellTowersPage(),
-  //   SettingsPage(),
-  //   // TelephonyPage()
-  // ];
-  final List _pagesConstructor = const [
-    MapTelPage,
-    MapGPSPage,
-    CellTowersPage,
-    SettingsPage,
-    // TelephonyPage()
-  ];
 
   getCurrentPage(cellTowers) {
     if (_currentIndex == 0) return MapTelPage(cellTowers: cellTowers);
@@ -59,7 +43,6 @@ class _AppState extends State<App> {
         builder: (context, state) {
       return state.when(
           initial: () => const Center(
-                // child: Text("Initializing App"),
                 child: CircularProgressIndicator(),
               ),
           error: (message) => const Center(
@@ -90,7 +73,6 @@ class _AppState extends State<App> {
                     updateCurrentIndex(value);
                   },
                 ),
-                // body: _pages[_currentIndex],
                 body: getCurrentPage(cellTowers),
               ));
     });

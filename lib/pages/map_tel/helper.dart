@@ -6,6 +6,9 @@ import 'package:flutter_2023_it4785/pages/cell_towers/model/cell_tower.model.dar
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:flutter/services.dart' show rootBundle;
+
+
 class ClusteringMakersHelper {
   static Future<Marker> Function(Cluster<CellTower>) get markerBuilder =>
       (cluster) async {
@@ -55,4 +58,14 @@ class ClusteringMakersHelper {
 
     return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
   }
+}
+
+Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  ByteData data = await rootBundle.load(path);
+  Codec codec = await instantiateImageCodec(data.buffer.asUint8List(),
+      targetWidth: width);
+  FrameInfo fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ImageByteFormat.png))!
+      .buffer
+      .asUint8List();
 }

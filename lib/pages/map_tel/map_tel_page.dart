@@ -33,10 +33,18 @@ class _MapTelPageState extends State<MapTelPage> {
   final _flutterTelephonyInfoPlugin = TelephonyAPI();
   String? errorMessage;
 
+  // custom marker icon
+  BitmapDescriptor? connectingTowerIcon;
+
   @override
   void initState() {
-    _manager = _initClusterManager();
     super.initState();
+    _manager = _initClusterManager();
+    getBytesFromAsset('assets/images/cell_tower.png', 128).then((bytes) {
+      setState(() {
+        connectingTowerIcon = BitmapDescriptor.fromBytes(bytes);
+      });
+    });
   }
 
   ClusterManager _initClusterManager() {
@@ -133,9 +141,12 @@ class _MapTelPageState extends State<MapTelPage> {
     if (connectingCellTowers.isEmpty) return;
 
     Set<Marker> markers = connectingCellTowers
-        .map((tower) => Marker(
-            markerId: MarkerId(tower.id.toString()),
-            position: LatLng(tower.lat, tower.long)))
+        .map(
+          (tower) => Marker(
+              markerId: MarkerId(tower.id.toString()),
+              position: LatLng(tower.lat, tower.long),
+              icon: connectingTowerIcon ?? BitmapDescriptor.defaultMarker),
+        )
         .toSet();
     Set<Circle> circles = connectingCellTowers
         .map(
@@ -163,6 +174,10 @@ class _MapTelPageState extends State<MapTelPage> {
     // List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
     List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
     List<CellTower> connectingCells = findAccordingCellTower(parsedTels);
+    List<CellTower> remainCells = widget.cellTowers
+        .where((cell) => !connectingCells.contains(cell))
+        .toList();
+    _manager.setItems(remainCells);
     visualizeConnectingCellTowers(connectingCells);
   }
 
