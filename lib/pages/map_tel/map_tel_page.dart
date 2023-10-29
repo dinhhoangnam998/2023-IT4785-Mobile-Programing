@@ -75,13 +75,13 @@ class _MapTelPageState extends State<MapTelPage> {
         return Future.value([]);
       }
       List<ParsedTelephonyInfo> parsedTelInfos = [];
-      telInfoList.forEach((rawTelephonyInfo) {
+      for (var rawTelephonyInfo in telInfoList) {
         if (rawTelephonyInfo != null) {
           try {
             parsedTelInfos.add(parseRawTelephonyInfo(rawTelephonyInfo));
           } catch (e) {}
         }
-      });
+      }
       notify(
           "Parsed successfully: ${parsedTelInfos.length}/${telInfoList.length}!",
           Colors.blue);
@@ -114,7 +114,7 @@ class _MapTelPageState extends State<MapTelPage> {
       List<ParsedTelephonyInfo> parsedTelInfos) {
     List<(ParsedTelephonyInfo, CellTower)> foundRecords = [];
     List<ParsedTelephonyInfo> notFoundTelInfos = [];
-    parsedTelInfos.forEach((telInfo) {
+    for (var telInfo in parsedTelInfos) {
       try {
         var tower = widget.cellTowers.firstWhere(
           (cellTower) =>
@@ -127,7 +127,7 @@ class _MapTelPageState extends State<MapTelPage> {
       } catch (e) {
         notFoundTelInfos.add(telInfo);
       }
-    });
+    }
     if (notFoundTelInfos.isNotEmpty) {
       notify(
           '${notFoundTelInfos.length}/${parsedTelInfos.length} parsedTelInfos were not found according cell towers!',
@@ -160,7 +160,7 @@ class _MapTelPageState extends State<MapTelPage> {
             radius: tower.radiusInMeters.toDouble(),
             strokeWidth: 2,
             strokeColor: Colors.green,
-            fillColor: Color.fromARGB(255, 3, 161, 87)
+            fillColor: const Color.fromARGB(255, 3, 161, 87)
                 .withOpacity(0.15 * tel.signalStrengthLevel));
       },
     ).toSet();

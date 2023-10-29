@@ -57,16 +57,16 @@ class _TelephonyPageState extends State<TelephonyPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
-            onPressed: getTelephonyInfos, child: Text('Get Cells Info')),
-        errorMessage == null ? Text('') : Text(errorMessage!),
+            onPressed: getTelephonyInfos, child: const Text('Get Cells Info')),
+        errorMessage == null ? const Text('') : Text(errorMessage!),
         Expanded(
           child: _telInfoList == null
-              ? Text('Cannot get telephony infos')
+              ? const Text('Cannot get telephony infos')
               : ListView.builder(
                   itemCount: _telInfoList!.length,
                   itemBuilder: (_, index) {
                     TelephonyInfo? telInfo = _telInfoList![index];
-                    if (telInfo == null) return Text('null');
+                    if (telInfo == null) return const Text('null');
                     String telephonyInfo =
                         'cellId: ${telInfo.cellId};\n displayName: ${telInfo.displayName};\n mobileNetworkCode: ${telInfo.mobileNetworkCode};\n networkGeneration: ${telInfo.networkGeneration};\n radioType: ${telInfo.radioType};\n cellSignalStrength: ${telInfo.cellSignalStrength}';
                     return ListTile(title: Text(telephonyInfo));
