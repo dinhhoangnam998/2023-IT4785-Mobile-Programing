@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 // initial position
 // stopClusteringZoom
+// .withOpacity(0.15 * tel.signalStrengthLevel));
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 

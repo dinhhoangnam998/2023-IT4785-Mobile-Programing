@@ -110,9 +110,9 @@ class _MapTelPageState extends State<MapTelPage> {
     return parsedTelInfos;
   }
 
-  List<CellTower> findAccordingCellTower(
+  List<(ParsedTelephonyInfo, CellTower)> findAccordingCellTower(
       List<ParsedTelephonyInfo> parsedTelInfos) {
-    List<CellTower> foundCellTowers = [];
+    List<(ParsedTelephonyInfo, CellTower)> foundRecords = [];
     List<ParsedTelephonyInfo> notFoundTelInfos = [];
     parsedTelInfos.forEach((telInfo) {
       try {
@@ -123,7 +123,7 @@ class _MapTelPageState extends State<MapTelPage> {
               telInfo.lac == cellTower.lac &&
               telInfo.cellId == cellTower.cellId,
         );
-        foundCellTowers.add(tower);
+        foundRecords.add((telInfo, tower));
       } catch (e) {
         notFoundTelInfos.add(telInfo);
       }
@@ -133,33 +133,41 @@ class _MapTelPageState extends State<MapTelPage> {
           '${notFoundTelInfos.length}/${parsedTelInfos.length} parsedTelInfos were not found according cell towers!',
           Colors.orange);
     }
-    return foundCellTowers;
+    return foundRecords;
   }
 
   void visualizeConnectingCellTowers(
-      List<CellTower> connectingCellTowers) async {
-    if (connectingCellTowers.isEmpty) return;
+      List<(ParsedTelephonyInfo, CellTower)> records) async {
+    if (records.isEmpty) return;
 
-    Set<Marker> markers = connectingCellTowers
-        .map(
-          (tower) => Marker(
-              markerId: MarkerId(tower.id.toString()),
-              position: LatLng(tower.lat, tower.long),
-              icon: connectingTowerIcon ?? BitmapDescriptor.defaultMarker),
-        )
-        .toSet();
-    Set<Circle> circles = connectingCellTowers
-        .map(
-          (tower) => Circle(
-              circleId: CircleId(tower.id.toString()),
-              center: LatLng(tower.lat, tower.long),
-              strokeWidth: 2),
-        )
-        .toSet();
+    Set<Marker> markers = records.map(
+      (record) {
+        CellTower tower = record.$2;
+        return Marker(
+            markerId: MarkerId(tower.id.toString()),
+            position: LatLng(tower.lat, tower.long),
+            icon: connectingTowerIcon ?? BitmapDescriptor.defaultMarker);
+      },
+    ).toSet();
+
+    Set<Circle> circles = records.map(
+      (record) {
+        ParsedTelephonyInfo tel = record.$1;
+        CellTower tower = record.$2;
+        return Circle(
+            circleId: CircleId(tower.id.toString()),
+            center: LatLng(tower.lat, tower.long),
+            radius: tower.radiusInMeters.toDouble(),
+            strokeWidth: 2,
+            strokeColor: Colors.green,
+            fillColor: Color.fromARGB(255, 3, 161, 87)
+                .withOpacity(0.15 * tel.signalStrengthLevel));
+      },
+    ).toSet();
 
     CameraPosition newPosition = CameraPosition(
         target: LatLng(
-            connectingCellTowers.first.lat, connectingCellTowers.first.long),
+            records.first.$2.lat, records.first.$2.long),
         zoom: 15);
     (await _controller.future)
         .animateCamera(CameraUpdate.newCameraPosition(newPosition));
@@ -173,12 +181,14 @@ class _MapTelPageState extends State<MapTelPage> {
   void findMyLocation() async {
     // List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
     List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
-    List<CellTower> connectingCells = findAccordingCellTower(parsedTels);
+    List<(ParsedTelephonyInfo, CellTower)> records =
+        findAccordingCellTower(parsedTels);
+    List<CellTower> connectingCells = records.map((item) => item.$2).toList();
     List<CellTower> remainCells = widget.cellTowers
         .where((cell) => !connectingCells.contains(cell))
         .toList();
     _manager.setItems(remainCells);
-    visualizeConnectingCellTowers(connectingCells);
+    visualizeConnectingCellTowers(records);
   }
 
   @override
