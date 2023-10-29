@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// initial position
+// stopClusteringZoom
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 

@@ -25,8 +25,8 @@ mixin _$CellTower {
   int get lac => throw _privateConstructorUsedError;
   int get mnc => throw _privateConstructorUsedError;
   int get mcc => throw _privateConstructorUsedError;
-  double get long => throw _privateConstructorUsedError;
   double get lat => throw _privateConstructorUsedError;
+  double get long => throw _privateConstructorUsedError;
   int get networkType => throw _privateConstructorUsedError;
   int get radiusInMeters => throw _privateConstructorUsedError;
 
@@ -47,8 +47,8 @@ abstract class $CellTowerCopyWith<$Res> {
       int lac,
       int mnc,
       int mcc,
-      double long,
       double lat,
+      double long,
       int networkType,
       int radiusInMeters});
 }
@@ -71,8 +71,8 @@ class _$CellTowerCopyWithImpl<$Res, $Val extends CellTower>
     Object? lac = null,
     Object? mnc = null,
     Object? mcc = null,
-    Object? long = null,
     Object? lat = null,
+    Object? long = null,
     Object? networkType = null,
     Object? radiusInMeters = null,
   }) {
@@ -97,13 +97,13 @@ class _$CellTowerCopyWithImpl<$Res, $Val extends CellTower>
           ? _value.mcc
           : mcc // ignore: cast_nullable_to_non_nullable
               as int,
-      long: null == long
-          ? _value.long
-          : long // ignore: cast_nullable_to_non_nullable
-              as double,
       lat: null == lat
           ? _value.lat
           : lat // ignore: cast_nullable_to_non_nullable
+              as double,
+      long: null == long
+          ? _value.long
+          : long // ignore: cast_nullable_to_non_nullable
               as double,
       networkType: null == networkType
           ? _value.networkType
@@ -131,8 +131,8 @@ abstract class _$$CellTowerImplCopyWith<$Res>
       int lac,
       int mnc,
       int mcc,
-      double long,
       double lat,
+      double long,
       int networkType,
       int radiusInMeters});
 }
@@ -153,8 +153,8 @@ class __$$CellTowerImplCopyWithImpl<$Res>
     Object? lac = null,
     Object? mnc = null,
     Object? mcc = null,
-    Object? long = null,
     Object? lat = null,
+    Object? long = null,
     Object? networkType = null,
     Object? radiusInMeters = null,
   }) {
@@ -179,13 +179,13 @@ class __$$CellTowerImplCopyWithImpl<$Res>
           ? _value.mcc
           : mcc // ignore: cast_nullable_to_non_nullable
               as int,
-      long: null == long
-          ? _value.long
-          : long // ignore: cast_nullable_to_non_nullable
-              as double,
       lat: null == lat
           ? _value.lat
           : lat // ignore: cast_nullable_to_non_nullable
+              as double,
+      long: null == long
+          ? _value.long
+          : long // ignore: cast_nullable_to_non_nullable
               as double,
       networkType: null == networkType
           ? _value.networkType
@@ -201,17 +201,18 @@ class __$$CellTowerImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$CellTowerImpl implements _CellTower {
-  const _$CellTowerImpl(
+class _$CellTowerImpl extends _CellTower {
+  _$CellTowerImpl(
       {required this.id,
       required this.cellId,
       required this.lac,
       required this.mnc,
       required this.mcc,
-      required this.long,
       required this.lat,
+      required this.long,
       required this.networkType,
-      required this.radiusInMeters});
+      required this.radiusInMeters})
+      : super._();
 
   factory _$CellTowerImpl.fromJson(Map<String, dynamic> json) =>
       _$$CellTowerImplFromJson(json);
@@ -227,9 +228,9 @@ class _$CellTowerImpl implements _CellTower {
   @override
   final int mcc;
   @override
-  final double long;
-  @override
   final double lat;
+  @override
+  final double long;
   @override
   final int networkType;
   @override
@@ -237,7 +238,7 @@ class _$CellTowerImpl implements _CellTower {
 
   @override
   String toString() {
-    return 'CellTower(id: $id, cellId: $cellId, lac: $lac, mnc: $mnc, mcc: $mcc, long: $long, lat: $lat, networkType: $networkType, radiusInMeters: $radiusInMeters)';
+    return 'CellTower(id: $id, cellId: $cellId, lac: $lac, mnc: $mnc, mcc: $mcc, lat: $lat, long: $long, networkType: $networkType, radiusInMeters: $radiusInMeters)';
   }
 
   @override
@@ -250,8 +251,8 @@ class _$CellTowerImpl implements _CellTower {
             (identical(other.lac, lac) || other.lac == lac) &&
             (identical(other.mnc, mnc) || other.mnc == mnc) &&
             (identical(other.mcc, mcc) || other.mcc == mcc) &&
-            (identical(other.long, long) || other.long == long) &&
             (identical(other.lat, lat) || other.lat == lat) &&
+            (identical(other.long, long) || other.long == long) &&
             (identical(other.networkType, networkType) ||
                 other.networkType == networkType) &&
             (identical(other.radiusInMeters, radiusInMeters) ||
@@ -260,8 +261,8 @@ class _$CellTowerImpl implements _CellTower {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, cellId, lac, mnc, mcc, long,
-      lat, networkType, radiusInMeters);
+  int get hashCode => Object.hash(runtimeType, id, cellId, lac, mnc, mcc, lat,
+      long, networkType, radiusInMeters);
 
   @JsonKey(ignore: true)
   @override
@@ -277,17 +278,18 @@ class _$CellTowerImpl implements _CellTower {
   }
 }
 
-abstract class _CellTower implements CellTower {
-  const factory _CellTower(
+abstract class _CellTower extends CellTower {
+  factory _CellTower(
       {required final int id,
       required final int cellId,
       required final int lac,
       required final int mnc,
       required final int mcc,
-      required final double long,
       required final double lat,
+      required final double long,
       required final int networkType,
       required final int radiusInMeters}) = _$CellTowerImpl;
+  _CellTower._() : super._();
 
   factory _CellTower.fromJson(Map<String, dynamic> json) =
       _$CellTowerImpl.fromJson;
@@ -303,9 +305,9 @@ abstract class _CellTower implements CellTower {
   @override
   int get mcc;
   @override
-  double get long;
-  @override
   double get lat;
+  @override
+  double get long;
   @override
   int get networkType;
   @override

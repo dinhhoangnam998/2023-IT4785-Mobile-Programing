@@ -17,13 +17,27 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _currentIndex = 0;
-  final List _pages = const [
-    MapTelPage(),
-    MapGPSPage(),
-    CellTowersPage(),
-    SettingsPage(),
+  // final List _pages = const [
+  //   MapTelPage(),
+  //   MapGPSPage(),
+  //   CellTowersPage(),
+  //   SettingsPage(),
+  //   // TelephonyPage()
+  // ];
+  final List _pagesConstructor = const [
+    MapTelPage,
+    MapGPSPage,
+    CellTowersPage,
+    SettingsPage,
     // TelephonyPage()
   ];
+
+  getCurrentPage(cellTowers) {
+    if (_currentIndex == 0) return MapTelPage(cellTowers: cellTowers);
+    if (_currentIndex == 1) return MapGPSPage();
+    if (_currentIndex == 2) return CellTowersPage();
+    if (_currentIndex == 3) return SettingsPage();
+  }
 
   void updateCurrentIndex(newValue) {
     setState(() {
@@ -51,7 +65,7 @@ class _AppState extends State<App> {
           error: (message) => const Center(
                 child: Text("Fail to initialize App"),
               ),
-          loaded: (_) => Scaffold(
+          loaded: (cellTowers) => Scaffold(
                 appBar: AppBar(
                   title: const Text('Find My Location'),
                 ),
@@ -76,7 +90,8 @@ class _AppState extends State<App> {
                     updateCurrentIndex(value);
                   },
                 ),
-                body: _pages[_currentIndex],
+                // body: _pages[_currentIndex],
+                body: getCurrentPage(cellTowers),
               ));
     });
   }

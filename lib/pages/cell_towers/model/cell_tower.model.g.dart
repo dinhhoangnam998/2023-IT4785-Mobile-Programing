@@ -13,8 +13,8 @@ _$CellTowerImpl _$$CellTowerImplFromJson(Map<String, dynamic> json) =>
       lac: json['lac'] as int,
       mnc: json['mnc'] as int,
       mcc: json['mcc'] as int,
-      long: (json['long'] as num).toDouble(),
       lat: (json['lat'] as num).toDouble(),
+      long: (json['long'] as num).toDouble(),
       networkType: json['networkType'] as int,
       radiusInMeters: json['radiusInMeters'] as int,
     );
@@ -26,8 +26,8 @@ Map<String, dynamic> _$$CellTowerImplToJson(_$CellTowerImpl instance) =>
       'lac': instance.lac,
       'mnc': instance.mnc,
       'mcc': instance.mcc,
-      'long': instance.long,
       'lat': instance.lat,
+      'long': instance.long,
       'networkType': instance.networkType,
       'radiusInMeters': instance.radiusInMeters,
     };
