@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_2023_it4785/pages/cell_towers/model/cell_tower.model.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/helper.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/model/ParsedTelephonyInfo.dart';
+import 'package:flutter_animarker/core/ripple_marker.dart';
+import 'package:flutter_animarker/flutter_map_marker_animation.dart';
 import 'package:flutter_telephony_info/flutter_telephony_info.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -27,7 +29,7 @@ class _MapTelPageState extends State<MapTelPage> {
   // Maker Cluster
   late ClusterManager _manager;
   Set<Marker> markers = {};
-  Set<Marker> additionalMarkers = {};
+  Set<RippleMarker> additionalMarkers = {};
   Set<Circle> additionalCircles = {};
   // Telephony
   final _flutterTelephonyInfoPlugin = TelephonyAPI();
@@ -140,13 +142,14 @@ class _MapTelPageState extends State<MapTelPage> {
       List<(ParsedTelephonyInfo, CellTower)> records) async {
     if (records.isEmpty) return;
 
-    Set<Marker> markers = records.map(
+    Set<RippleMarker> markers = records.map(
       (record) {
         CellTower tower = record.$2;
-        return Marker(
+        return RippleMarker(
             markerId: MarkerId(tower.id.toString()),
             position: LatLng(tower.lat, tower.long),
-            icon: connectingTowerIcon ?? BitmapDescriptor.defaultMarker);
+            icon: connectingTowerIcon ?? BitmapDescriptor.defaultMarker,
+            ripple: true);
       },
     ).toSet();
 
@@ -160,15 +163,13 @@ class _MapTelPageState extends State<MapTelPage> {
             radius: tower.radiusInMeters.toDouble(),
             strokeWidth: 2,
             strokeColor: Colors.green,
-            fillColor: Color.fromARGB(255, 3, 161, 87)
+            fillColor: const Color.fromARGB(255, 3, 161, 87)
                 .withOpacity(0.15 * tel.signalStrengthLevel));
       },
     ).toSet();
 
     CameraPosition newPosition = CameraPosition(
-        target: LatLng(
-            records.first.$2.lat, records.first.$2.long),
-        zoom: 15);
+        target: LatLng(records.first.$2.lat, records.first.$2.long), zoom: 15);
     (await _controller.future)
         .animateCamera(CameraUpdate.newCameraPosition(newPosition));
 
@@ -194,17 +195,28 @@ class _MapTelPageState extends State<MapTelPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: _initPosition,
-            markers: {...markers, ...additionalMarkers},
-            circles: additionalCircles,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-              _manager.setMapId(controller.mapId);
-            },
-            onCameraMove: _manager.onCameraMove,
-            onCameraIdle: _manager.updateMap),
+        body: Animarker(
+          mapId: _controller.future.then<int>((value) => value.mapId),
+          curve: Curves.bounceInOut,
+          duration: const Duration(seconds: 10),
+          rippleColor: Colors.green,
+          rippleRadius: 0.3,
+          markers: {
+            ...markers,
+            ...additionalMarkers,
+          },
+          child: GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _initPosition,
+              // markers: {...markers, ...additionalMarkers},
+              circles: additionalCircles,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+                _manager.setMapId(controller.mapId);
+              },
+              onCameraMove: _manager.onCameraMove,
+              onCameraIdle: _manager.updateMap),
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: findMyLocation,
           mini: true,
