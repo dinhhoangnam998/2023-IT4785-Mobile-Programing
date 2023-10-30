@@ -45,4 +45,38 @@ class CellTowersCubit extends Cubit<CellTowersState> {
       emit(CellTowersState.error(e.toString()));
     }
   }
+
+  Future<void> addCellTower(CellTower cellTower) async {
+    try {
+      state.maybeWhen(
+        orElse: () {},
+        loaded: (cellTowers) async {
+          var newCellTowers = List.of(cellTowers)..add(cellTower);
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          // await prefs.setString(kStorageKey, jsonEncode(newCellTowers));
+          emit(CellTowersState.loaded(newCellTowers));
+        },
+      );
+    } catch (e) {
+      emit(CellTowersState.error(e.toString()));
+    }
+  }
+
+  Future<void> editCellTower(CellTower cellTower) async {
+    try {
+      state.maybeWhen(
+        orElse: () {},
+        loaded: (cellTowers) async {
+          var newCellTowers = List.of(cellTowers)
+            ..removeWhere((cell) => cell.cellId == cellTower.cellId)
+            ..add(cellTower);
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          // await prefs.setString(kStorageKey, jsonEncode(newCellTowers));
+          emit(CellTowersState.loaded(newCellTowers));
+        },
+      );
+    } catch (e) {
+      emit(CellTowersState.error(e.toString()));
+    }
+  }
 }
