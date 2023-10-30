@@ -178,8 +178,8 @@ class _MapTelPageState extends State<MapTelPage> {
   }
 
   void findMyLocation() async {
-    List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
-    // List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
+    // List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
+    List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
     List<(ParsedTelephonyInfo, CellTower)> records =
         findAccordingCellTower(parsedTels);
     List<CellTower> connectingCells = records.map((item) => item.$2).toList();
