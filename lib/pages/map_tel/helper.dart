@@ -17,7 +17,9 @@ class ClusteringMakersHelper {
           position: cluster.location,
           onTap: () {
             print('---- $cluster');
-            cluster.items.forEach((p) => print(p));
+            for (var p in cluster.items) {
+              print(p);
+            }
           },
           icon: await _getMarkerBitmap(cluster.isMultiple ? 125 : 75,
               text: cluster.isMultiple ? cluster.count.toString() : null),

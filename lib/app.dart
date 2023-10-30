@@ -18,9 +18,9 @@ class _AppState extends State<App> {
 
   getCurrentPage(cellTowers) {
     if (_currentIndex == 0) return MapTelPage(cellTowers: cellTowers);
-    if (_currentIndex == 1) return MapGPSPage();
-    if (_currentIndex == 2) return CellTowersPage();
-    if (_currentIndex == 3) return SettingsPage();
+    if (_currentIndex == 1) return const MapGPSPage();
+    if (_currentIndex == 2) return const CellTowersPage();
+    if (_currentIndex == 3) return const SettingsPage();
   }
 
   void updateCurrentIndex(newValue) {
@@ -51,6 +51,7 @@ class _AppState extends State<App> {
           loaded: (cellTowers) => Scaffold(
                 appBar: AppBar(
                   title: const Text('Find My Location'),
+                  elevation: 0,
                 ),
                 bottomNavigationBar: BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
@@ -59,7 +60,7 @@ class _AppState extends State<App> {
                   unselectedItemColor: Colors.grey,
                   items: const [
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.map), label: "Map Tel"),
+                        icon: Icon(Icons.map), label: "Map Telephony"),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.gps_fixed), label: "Map GPS"),
                     BottomNavigationBarItem(
