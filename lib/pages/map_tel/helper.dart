@@ -5,15 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_2023_it4785/pages/cell_towers/model/cell_tower.model.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 
+var uuid = Uuid();
 
 class ClusteringMakersHelper {
   static Future<Marker> Function(Cluster<CellTower>) get markerBuilder =>
       (cluster) async {
         return Marker(
-          markerId: MarkerId(cluster.getId()),
+          markerId: MarkerId(cluster.getId() + uuid.v4()),
           position: cluster.location,
           onTap: () {
             print('---- $cluster');
