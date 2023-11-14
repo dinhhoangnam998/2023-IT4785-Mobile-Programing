@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'cell_towers_state.dart';
 part 'cell_towers_cubit.freezed.dart';
 
-String kStorageKey = 'cellTowers';
+String kStorageKey = 'cellTowers2';
 
 class CellTowersCubit extends Cubit<CellTowersState> {
   CellTowersCubit() : super(const CellTowersState.initial());
@@ -19,7 +19,7 @@ class CellTowersCubit extends Cubit<CellTowersState> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String cellTowersString = prefs.getString(kStorageKey) ??
           await DefaultAssetBundle.of(context)
-              .loadString("assets/data/cell_info.json");
+              .loadString("assets/data/cell_info_2.json");
       List<dynamic> cellTowersJson = jsonDecode(cellTowersString);
       List<CellTower> cellTowers = cellTowersJson
           .map<CellTower>((item) => CellTower.fromJson(item))

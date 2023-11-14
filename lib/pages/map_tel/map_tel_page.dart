@@ -177,15 +177,15 @@ class _MapTelPageState extends State<MapTelPage> {
   }
 
   void findMyLocation() async {
-    List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
-    // List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
+    // List<ParsedTelephonyInfo> parsedTels = await getParsedTelephonyInfo();
+    List<ParsedTelephonyInfo> parsedTels = await getMockupParsedTelephonyInfo();
     List<(ParsedTelephonyInfo, CellTower)> records =
         findAccordingCellTower(parsedTels);
     List<CellTower> connectingCells = records.map((item) => item.$2).toList();
-    List<CellTower> remainCells = widget.cellTowers
-        .where((cell) => !connectingCells.contains(cell))
-        .toList();
-    _manager.setItems(remainCells);
+    // List<CellTower> remainCells = widget.cellTowers
+    //     .where((cell) => !connectingCells.contains(cell))
+    //     .toList();
+    // _manager.setItems(remainCells);
     visualizeConnectingCellTowers(records);
   }
 
