@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'cell_towers_state.dart';
 part 'cell_towers_cubit.freezed.dart';
 
-String kStorageKey = 'cellTowers2';
+String kStorageKey = 'cellTowers-v3';
 
 class CellTowersCubit extends Cubit<CellTowersState> {
   CellTowersCubit() : super(const CellTowersState.initial());

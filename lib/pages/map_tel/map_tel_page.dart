@@ -182,10 +182,10 @@ class _MapTelPageState extends State<MapTelPage> {
     List<(ParsedTelephonyInfo, CellTower)> records =
         findAccordingCellTower(parsedTels);
     List<CellTower> connectingCells = records.map((item) => item.$2).toList();
-    // List<CellTower> remainCells = widget.cellTowers
-    //     .where((cell) => !connectingCells.contains(cell))
-    //     .toList();
-    // _manager.setItems(remainCells);
+    List<CellTower> remainCells = widget.cellTowers
+        .where((cell) => !connectingCells.contains(cell))
+        .toList();
+    _manager.setItems(remainCells);
     visualizeConnectingCellTowers(records);
   }
 
