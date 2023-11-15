@@ -9,6 +9,7 @@ import 'package:flutter_2023_it4785/pages/map_tel/helper.dart';
 import 'package:flutter_2023_it4785/pages/map_tel/model/ParsedTelephonyInfo.dart';
 import 'package:flutter_animarker/flutter_map_marker_animation.dart';
 import 'package:flutter_telephony_info/flutter_telephony_info.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -36,6 +37,11 @@ class _MapTelPageState extends State<MapTelPage> {
 
   // custom marker icon
   BitmapDescriptor? connectingTowerIcon;
+  BitmapDescriptor? currentLocationIcon;
+
+  // Geolocator
+  LatLng? _currentLocation;
+  StreamSubscription<Position>? _positionStream;
 
   @override
   void initState() {
@@ -46,6 +52,20 @@ class _MapTelPageState extends State<MapTelPage> {
         connectingTowerIcon = BitmapDescriptor.fromBytes(bytes);
       });
     });
+    ClusteringMakersHelper.getMarkerBitmapCurrentPosition(75)
+        .then((BitmapDescriptor currentIcon) {
+      setState(() {
+        currentLocationIcon = currentIcon;
+      });
+    });
+    // _trackLocation();
+    _updateCurrentLocationGPS();
+  }
+
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    super.dispose();
   }
 
   ClusterManager _initClusterManager() {
@@ -57,6 +77,72 @@ class _MapTelPageState extends State<MapTelPage> {
   void _updateMarkers(Set<Marker> markers) {
     setState(() {
       this.markers = markers;
+    });
+  }
+
+  Future<void> _updateCurrentLocationGPS() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _currentLocation = LatLng(position.latitude, position.longitude);
+    });
+  }
+
+  Future<void> _trackLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 0,
+    );
+    StreamSubscription<Position> positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position? position) {
+      if (position != null) {
+        setState(() {
+          _currentLocation = LatLng(position.latitude, position.longitude);
+        });
+      }
+    });
+
+    setState(() {
+      _positionStream = positionStream;
     });
   }
 
@@ -191,6 +277,13 @@ class _MapTelPageState extends State<MapTelPage> {
 
   @override
   Widget build(BuildContext context) {
+    Set<Marker> allMarkers = {...markers, ...additionalMarkers};
+    if (_currentLocation != null && currentLocationIcon != null) {
+      allMarkers.add(Marker(
+          markerId: const MarkerId('_currentLocation'),
+          icon: currentLocationIcon!,
+          position: _currentLocation!));
+    }
     return Scaffold(
         body: Animarker(
           mapId: _controller.future.then<int>((value) => value.mapId),
@@ -198,10 +291,7 @@ class _MapTelPageState extends State<MapTelPage> {
           duration: const Duration(seconds: 10),
           rippleColor: Colors.green,
           rippleRadius: 0.3,
-          markers: {
-            ...markers,
-            ...additionalMarkers,
-          },
+          markers: allMarkers,
           child: GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _initPosition,
@@ -215,7 +305,10 @@ class _MapTelPageState extends State<MapTelPage> {
               onCameraIdle: _manager.updateMap),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: findMyLocation,
+          onPressed: () {
+            findMyLocation();
+            _updateCurrentLocationGPS();
+          },
           mini: true,
           child: const Icon(Icons.gps_fixed_outlined),
         ),
